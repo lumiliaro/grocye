@@ -1,0 +1,63 @@
+version: "3"
+services:
+    backend:
+        container_name: restapi
+        build:
+            context: ./backend/grocyerest
+            dockerfile: Dockerfile
+            no_cache: true
+        ports:
+            - "8080:8080"
+        environment:
+            - SPRING.PROFILES.ACTIVE=default
+            - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
+            - SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://db:${DATABASE_PORT}/${DATABASE_NAME}
+            - SPRING_DATASOURCE_USERNAME=${DATABASE_USER}
+            - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+            - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+        depends_on:
+            - db
+        restart: always
+        # networks:
+        #     - bridge-network
+    db:
+        image: "postgres:alpine"
+        container_name: db
+        restart: always
+        environment:
+            - POSTGRES_DB=${DATABASE_NAME}
+            - POSTGRES_USER=${DATABASE_USER}
+            - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+        ports:
+            - "5432:5432"
+        volumes:
+            - database_data:/var/lib/postgresql/data
+        # networks:
+        #     - bridge-network
+volumes:
+    database_data:
+
+    # frontend:
+    #     image: "grocye/frontend:0.0.1"
+    #     container_name: grocye-frontend
+    #     ports:
+    #         - "3000:3000"
+    #         - "3010:3010"
+    #     restart: always
+    #     # volumes:
+    #     #     - ./app:/app
+    #     #     - node_modules:/app/node_modules
+    #     build:
+    #         context: ./frontend/grocyeui
+    #         dockerfile: Dockerfile
+    #         no_cache: true
+    #     environment:
+    #         - WDS_SOCKET_HOST=127.0.0.1
+    #         - CHOKIDAR_USEPOLLING=true
+    #         - WATCHPACK_POLLING=true
+    #     networks:
+    #         - bridge-network
+# networks:
+#     bridge-network:
+#         driver: bridge
