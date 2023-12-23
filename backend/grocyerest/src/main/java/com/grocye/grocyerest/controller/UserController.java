@@ -2,6 +2,7 @@ package com.grocye.grocyerest.controller;
 
 import com.grocye.grocyerest.assembler.UserModelAssembler;
 import com.grocye.grocyerest.dto.RegistrationDto;
+import com.grocye.grocyerest.dto.UserUpdateDto;
 import com.grocye.grocyerest.model.User;
 import com.grocye.grocyerest.repository.UserRepository;
 import com.grocye.grocyerest.service.UserService;
@@ -67,16 +68,15 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody User newUser) {
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
         User updatedUser = repository.findById(id) //
                 .map(user -> {
-                    user = newUser;
+                    user.setUsername(userUpdateDto.getUsername());
+                    user.setEmail(userUpdateDto.getEmail());
+                    user.setProfileImageUrl(userUpdateDto.getProfileImageUrl());
                     return repository.save(user);
-                }) //
-                .orElseGet(() -> {
-                    newUser.setId(id);
-                    return repository.save(newUser);
-                });
+                }).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
 
         EntityModel<User> entityModel = assembler.toModel(updatedUser);
 

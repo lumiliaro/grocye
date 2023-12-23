@@ -3,11 +3,9 @@ package com.grocye.grocyerest.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class RegistrationDto {
 
     @Valid
@@ -27,4 +25,7 @@ public class RegistrationDto {
     @NotBlank(message = "Invalid password confirmation: Empty password confirmation")
     @NotNull(message = "Invalid password confirmation: Password confirmation is NULL")
     private String passwordConfirmation;
+
+    @URL(message = "Invalid profile-image url: Must be a valid url")
+    private String profileImageUrl;
 }
